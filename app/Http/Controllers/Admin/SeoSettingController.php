@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class SeoSettingController extends Controller
@@ -23,7 +24,7 @@ class SeoSettingController extends Controller
             'seo_title'                   => ['nullable', 'string', 'max:70'],
             'seo_description'             => ['nullable', 'string', 'max:160'],
             'seo_keywords'                => ['nullable', 'string', 'max:255'],
-            'seo_robots'                  => ['nullable', 'in:index,follow|index,nofollow|noindex,follow|noindex,nofollow'],
+            'seo_robots'                  => ['nullable', Rule::in(['index,follow', 'index,nofollow', 'noindex,follow', 'noindex,nofollow'])],
             'seo_og_title'                => ['nullable', 'string', 'max:95'],
             'seo_og_description'          => ['nullable', 'string', 'max:200'],
             'seo_og_image'                => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
