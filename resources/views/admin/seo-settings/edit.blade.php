@@ -307,10 +307,10 @@
                                 {{ parse_url(config('app.url'), PHP_URL_HOST) }}
                             </div>
                             <div style="font-size: .9rem; font-weight: 700; color: #1d2129; line-height: 1.3; margin-bottom: .15rem;">
-                                {{ $settings['seo_og_title'] ?: ($settings['seo_title'] ?? config('app.name')) }}
+                                {{ ($settings['seo_og_title'] ?? '') ?: ($settings['seo_title'] ?? config('app.name')) }}
                             </div>
                             <div style="font-size: .8rem; color: #606770; line-height: 1.3;">
-                                {{ Str::limit($settings['seo_og_description'] ?: ($settings['seo_description'] ?? ''), 90) }}
+                                {{ \Illuminate\Support\Str::limit(($settings['seo_og_description'] ?? '') ?: ($settings['seo_description'] ?? ''), 90) }}
                             </div>
                         </div>
                     </div>
