@@ -157,15 +157,11 @@
                                      style="max-width: 240px; max-height: 126px; object-fit: cover; border-radius: 8px; border: 1px solid var(--ap-border);">
                                 <div>
                                     <div class="text-muted mb-2" style="font-size:.8rem;">Image actuelle</div>
-                                    <form action="{{ route('admin.seo-settings.og-image.delete') }}"
-                                          method="POST"
-                                          onsubmit="return confirm('Supprimer cette image ?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="bi bi-trash me-1"></i>Supprimer
-                                        </button>
-                                    </form>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="if(confirm('Supprimer cette image ?')) document.getElementById('deleteOgForm').submit();">
+                                        <i class="bi bi-trash me-1"></i>Supprimer
+                                    </button>
                                 </div>
                             </div>
                         @endif
@@ -328,6 +324,15 @@
         </button>
     </div>
 
+</form>
+
+{{-- Form suppression image OG — hors du form principal pour éviter l'imbrication --}}
+<form id="deleteOgForm"
+      action="{{ route('admin.seo-settings.og-image.delete') }}"
+      method="POST"
+      style="display:none;">
+    @csrf
+    @method('DELETE')
 </form>
 
 @endsection
