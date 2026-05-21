@@ -24,7 +24,7 @@ jobs:
           coverage: none
 
       - name: Installer les dépendances
-        run: composer install --optimize-autoloader --no-interaction
+        run: composer install --optimize-autoloader --no-interaction --ignore-platform-reqs
 
       - name: Configurer l'environnement de test
         run: |
@@ -101,7 +101,7 @@ jobs:
           password: ${{ secrets.MAIL_PASSWORD }}
           subject: "Erreur déploiement — palermeautopro.shop"
           to: paulsyl20jobs@gmail.com
-          from: ${{ secrets.MAIL_USERNAME }}
+          from: paulsyl20jobs@gmail.com
           body: |
             Une erreur s'est produite lors du pipeline CI/CD.
 
