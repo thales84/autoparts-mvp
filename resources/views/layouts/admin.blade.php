@@ -77,6 +77,10 @@
         <div class="sidebar-section">Commerce</div>
 
         <nav class="nav flex-column">
+            <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
+               href="{{ route('admin.users.index') }}">
+                <i class="bi bi-people-fill"></i>Clients
+            </a>
             <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"
                href="{{ route('admin.orders.index') }}">
                 <i class="bi bi-receipt-cutoff"></i>Commandes

@@ -28,10 +28,11 @@ class RegisterController extends Controller
             'status'   => 'active',
         ]);
 
+        event(new Registered($user));
+
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home'))
-            ->with('success', 'Bienvenue ' . $user->name . ' ! Votre compte a été créé.');
+        return redirect()->route('verification.notice');
     }
 }

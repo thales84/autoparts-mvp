@@ -27,13 +27,19 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        if (Auth::user()->status === 'blocked') {
+        $user = Auth::user();
+
+        if ($user->status === 'blocked') {
             Auth::logout();
             $request->session()->invalidate();
             return back()->withErrors(['email' => 'Votre compte a été désactivé.']);
         }
 
+        if (! $user->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice');
+        }
+
         return redirect()->intended(route('home'))
-            ->with('success', 'Connexion réussie. Bienvenue ' . Auth::user()->name . ' !');
+            ->with('success', 'Connexion réussie. Bienvenue ' . $user->name . ' !');
     }
 }

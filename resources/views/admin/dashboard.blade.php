@@ -59,6 +59,17 @@
             </div>
         </div>
     </div>
+    <div class="col-6 col-xl-3">
+        <div class="ap-stat-card">
+            <div class="stat-icon-wrap" style="background: #f0f9ff; color: #0369a1;">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div>
+                <div class="stat-value">{{ $stats['customers_total'] }}</div>
+                <div class="stat-label">Clients inscrits</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row g-4">
@@ -157,6 +168,41 @@
             @endif
         </div>
 
+    </div>
+</div>
+
+{{-- Derniers clients inscrits --}}
+<div class="row g-4 mt-0">
+    <div class="col-12">
+        <div style="background: #fff; border: 1px solid var(--ap-border); border-radius: var(--ap-radius); overflow: hidden;">
+            <div class="px-4 py-3" style="border-bottom: 1px solid var(--ap-border);">
+                <span class="fw-bold" style="font-size: .88rem;">Derniers clients inscrits</span>
+            </div>
+            @if($recentUsers->isEmpty())
+                <div class="p-4 text-center text-muted" style="font-size: .88rem;">Aucun client inscrit.</div>
+            @else
+                <table class="table table-hover mb-0" style="font-size: .85rem;">
+                    <thead style="background: #f8fafc;">
+                        <tr>
+                            <th class="px-4 py-2 fw-semibold" style="font-size: .75rem; text-transform: uppercase; letter-spacing: .4px; color: var(--ap-text-muted);">Nom</th>
+                            <th class="py-2 fw-semibold" style="font-size: .75rem; text-transform: uppercase; letter-spacing: .4px; color: var(--ap-text-muted);">E-mail</th>
+                            <th class="py-2 fw-semibold" style="font-size: .75rem; text-transform: uppercase; letter-spacing: .4px; color: var(--ap-text-muted);">Téléphone</th>
+                            <th class="py-2 fw-semibold" style="font-size: .75rem; text-transform: uppercase; letter-spacing: .4px; color: var(--ap-text-muted);">Inscrit le</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($recentUsers as $customer)
+                            <tr>
+                                <td class="px-4 py-2 fw-semibold">{{ $customer->name }}</td>
+                                <td class="py-2" style="color: var(--ap-text-muted);">{{ $customer->email }}</td>
+                                <td class="py-2" style="color: var(--ap-text-muted);">{{ $customer->phone ?? '—' }}</td>
+                                <td class="py-2" style="color: var(--ap-text-muted); font-size: .8rem;">{{ $customer->created_at->format('d/m/Y à H:i') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
     </div>
 </div>
 

@@ -10,6 +10,7 @@ use App\Http\Controllers\Public\AccountController;
 use App\Http\Controllers\Public\SitemapController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\Admin\PaymentSettingController;
 use App\Http\Controllers\Admin\SeoSettingController;
 use App\Http\Controllers\Admin\PaymentProofController as AdminProofController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 // Public routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
@@ -39,7 +41,7 @@ Route::delete('/cart/remove/{productId}', [CartController::class, 'remove'])->na
 Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 // Checkout + account routes (auth required)
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
@@ -65,6 +67,11 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', [LogoutController::class, 'destroy'])->name('logout')->middleware('auth');
+
+// Email verification
+Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->middleware('auth')->name('verification.notice');
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware(['auth', 'signed', 'throttle:6,1'])->name('verification.verify');
+Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 // Admin routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
@@ -94,6 +101,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('orders/{order}/pdf/bon-commande', [AdminOrderController::class, 'pdfBonCommande'])->name('orders.pdf.bon-commande');
     Route::get('orders/{order}/pdf/facture', [AdminOrderController::class, 'pdfFacture'])->name('orders.pdf.facture');
     Route::get('orders/{order}/pdf/recu', [AdminOrderController::class, 'pdfRecu'])->name('orders.pdf.recu');
+
+    Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::patch('users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::delete('users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
     Route::get('part-requests', [AdminPartRequestController::class, 'index'])->name('part-requests.index');
     Route::get('part-requests/{partRequest}', [AdminPartRequestController::class, 'show'])->name('part-requests.show');
