@@ -7,6 +7,7 @@ use App\Http\Controllers\Public\PartRequestController;
 use App\Http\Controllers\Public\CartController;
 use App\Http\Controllers\Public\CheckoutController;
 use App\Http\Controllers\Public\AccountController;
+use App\Http\Controllers\Public\SitemapController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\Admin\PaymentProofController as AdminProofController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 
 // Public routes
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');

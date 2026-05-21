@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -42,6 +43,7 @@ class ProductController extends Controller
         unset($data['image']);
 
         Product::create($data);
+        Cache::forget('sitemap_xml');
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Produit créé avec succès.');
@@ -71,6 +73,7 @@ class ProductController extends Controller
         }
 
         $product->update($data);
+        Cache::forget('sitemap_xml');
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Produit mis à jour.');
@@ -81,6 +84,7 @@ class ProductController extends Controller
         // Si déjà commandé → désactiver plutôt que supprimer
         if ($product->orderItems()->exists()) {
             $product->update(['status' => 'inactive']);
+            Cache::forget('sitemap_xml');
 
             return redirect()->route('admin.products.index')
                 ->with('success', 'Produit désactivé (déjà commandé — suppression impossible).');
@@ -88,6 +92,7 @@ class ProductController extends Controller
 
         $this->deleteImage($product->main_image_path);
         $product->delete();
+        Cache::forget('sitemap_xml');
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Produit supprimé.');
