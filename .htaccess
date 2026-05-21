@@ -1,0 +1,6 @@
+# Hostinger — redirection vers public/ si le document root est la racine du projet.
+# Si vous avez pu pointer le document root directement sur public/, ce fichier est inutile.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
