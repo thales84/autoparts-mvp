@@ -182,7 +182,31 @@
                     <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm flex-grow-1">Connexion</a>
                     <a href="{{ route('register') }}" class="btn btn-sm flex-grow-1 btn-ap-accent">Inscription</a>
                 </div>
-            @endguest
+            @else
+                <div class="d-lg-none mt-2 mb-1" style="border-top: 1px solid rgba(255,255,255,.15); padding-top: .75rem;">
+                    <div style="font-size: .75rem; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .6px; margin-bottom: .5rem;">
+                        <i class="bi bi-person-fill me-1"></i>{{ Auth::user()->name }}
+                    </div>
+                    @if(Auth::user()->role === 'admin')
+                        <a class="nav-link py-1" href="{{ route('admin.dashboard') }}">
+                            <i class="bi bi-speedometer2 me-2"></i>Administration
+                        </a>
+                    @endif
+                    <a class="nav-link py-1" href="{{ route('account.profile') }}">
+                        <i class="bi bi-person-circle me-2"></i>Mon profil
+                    </a>
+                    <a class="nav-link py-1" href="{{ route('account.orders') }}">
+                        <i class="bi bi-receipt me-2"></i>Mes commandes
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" class="mt-1">
+                        @csrf
+                        <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start py-1"
+                                style="color: #f87171;">
+                            <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                        </button>
+                    </form>
+                </div>
+            @endauth
 
         </div>{{-- /.collapse --}}
     </div>
