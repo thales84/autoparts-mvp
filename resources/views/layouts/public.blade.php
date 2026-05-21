@@ -10,9 +10,6 @@
     $seoOgImage     = Setting::get('seo_og_image',    '');
     $seoGa          = Setting::get('seo_google_analytics', '');
     $seoGsv         = Setting::get('seo_google_site_verification', '');
-
-    $pageTitle      = View::hasSection('seo_title')       ? View::getSection('seo_title')       : $seoTitle;
-    $pageDesc       = View::hasSection('seo_description') ? View::getSection('seo_description') : $seoDescription;
 @endphp
 <html lang="fr">
 <head>
