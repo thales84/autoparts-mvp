@@ -7,6 +7,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\ImageOptimizer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -102,11 +103,13 @@ class ProductController extends Controller
 
     private function storeImage(\Illuminate\Http\UploadedFile $file): string
     {
-        $ext  = strtolower($file->getClientOriginalExtension());
-        $name = bin2hex(random_bytes(8)) . '.' . $ext;
-        $file->move(public_path('uploads/products'), $name);
+        $destDir = public_path('uploads/products');
+        $tmpPath = $file->getRealPath();
 
-        return 'uploads/products/' . $name;
+        $optimizer = new ImageOptimizer();
+        $filename  = $optimizer->optimizeUpload($tmpPath, $destDir);
+
+        return 'uploads/products/' . $filename;
     }
 
     private function deleteImage(?string $path): void
