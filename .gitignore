@@ -24,3 +24,7 @@ Homestead.yaml
 Thumbs.db
 /public/uploads/products/*
 !/public/uploads/products/.gitkeep
+/public/uploads/proofs/*
+!/public/uploads/proofs/.gitkeep
+*.pdf
+/.claude

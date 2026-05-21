@@ -1,3 +1,4 @@
+
 # PHASE-02.md — Base de données, migrations et modèles Eloquent
 
 ## 1. Contexte obligatoire

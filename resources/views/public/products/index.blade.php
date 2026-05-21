@@ -5,84 +5,109 @@
 @section('content')
 <div class="container py-4">
 
-    {{-- Titre + lien demande --}}
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <h2 class="mb-0">Catalogue</h2>
-        <a href="{{ route('part-requests.create') }}" class="btn btn-outline-dark btn-sm">
-            <i class="bi bi-question-circle me-1"></i>Vous ne trouvez pas votre pièce ?
+    {{-- En-tête --}}
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold mb-0" style="color: var(--ap-text);">Catalogue</h1>
+            <p class="text-muted small mb-0">
+                {{ $products->total() }} pièce{{ $products->total() > 1 ? 's' : '' }} disponible{{ $products->total() > 1 ? 's' : '' }}
+                @if(request('q')) — recherche : <strong>« {{ request('q') }} »</strong> @endif
+            </p>
+        </div>
+        <a href="{{ route('part-requests.create') }}"
+           class="btn btn-ap-outline-primary btn-sm">
+            <i class="bi bi-question-circle me-1"></i>Pièce introuvable ?
         </a>
     </div>
 
-    {{-- Formulaire de recherche/filtres --}}
-    <form action="{{ route('products.index') }}" method="GET" class="card card-body mb-4 shadow-sm">
-        <div class="row g-2 align-items-end">
-            <div class="col-md-4">
-                <label for="q" class="form-label small fw-semibold">Recherche</label>
-                <input
-                    type="text"
-                    id="q"
-                    name="q"
-                    class="form-control form-control-sm"
-                    value="{{ request('q') }}"
-                    placeholder="Nom, SKU, référence…"
-                >
+    {{-- Filtres --}}
+    <div class="ap-filter-panel">
+        <form action="{{ route('products.index') }}" method="GET">
+            <div class="row g-2 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Recherche</label>
+                    <input
+                        type="text"
+                        name="q"
+                        class="form-control"
+                        value="{{ request('q') }}"
+                        placeholder="Nom, SKU, référence constructeur…"
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label">Catégorie</label>
+                    <select name="category" class="form-select">
+                        <option value="">Toutes</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
+                                {{ $cat->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label">Marque</label>
+                    <select id="make" name="make" class="form-select">
+                        <option value="">Toutes</option>
+                        @foreach($makes as $make)
+                            <option value="{{ $make->id }}" {{ request('make') == $make->id ? 'selected' : '' }}>
+                                {{ $make->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label">Modèle</label>
+                    <select id="model" name="model" class="form-select">
+                        <option value="">Tous</option>
+                        @foreach($selectedModels as $model)
+                            <option value="{{ $model->id }}" {{ request('model') == $model->id ? 'selected' : '' }}>
+                                {{ $model->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-6 col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-ap-primary flex-grow-1">
+                        <i class="bi bi-search me-1"></i>Filtrer
+                    </button>
+                    @if(request()->hasAny(['q','category','make','model']))
+                        <a href="{{ route('products.index') }}"
+                           class="btn btn-sm"
+                           style="background: #EDE8DF; color: var(--ap-text-muted); border: 1px solid var(--ap-border);"
+                           title="Réinitialiser les filtres">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    @endif
+                </div>
             </div>
-            <div class="col-md-2">
-                <label for="category" class="form-label small fw-semibold">Catégorie</label>
-                <select id="category" name="category" class="form-select form-select-sm">
-                    <option value="">Toutes</option>
-                    @foreach($categories as $cat)
-                        <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label for="make" class="form-label small fw-semibold">Marque véhicule</label>
-                <select id="make" name="make" class="form-select form-select-sm">
-                    <option value="">Toutes</option>
-                    @foreach($makes as $make)
-                        <option value="{{ $make->id }}" {{ request('make') == $make->id ? 'selected' : '' }}>
-                            {{ $make->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label for="model" class="form-label small fw-semibold">Modèle</label>
-                <select id="model" name="model" class="form-select form-select-sm">
-                    <option value="">Tous</option>
-                    @foreach($selectedModels as $model)
-                        <option value="{{ $model->id }}" {{ request('model') == $model->id ? 'selected' : '' }}>
-                            {{ $model->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-2 d-flex gap-2">
-                <button type="submit" class="btn btn-dark btn-sm flex-grow-1">
-                    <i class="bi bi-search me-1"></i>Filtrer
-                </button>
-                @if(request()->hasAny(['q','category','make','model']))
-                    <a href="{{ route('products.index') }}" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-x"></i>
-                    </a>
-                @endif
-            </div>
-        </div>
-    </form>
 
-    {{-- Résultats --}}
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <p class="text-muted small mb-0">
-            {{ $products->total() }} résultat{{ $products->total() > 1 ? 's' : '' }}
-            @if(request('q'))
-                pour « {{ request('q') }} »
+            {{-- Filtres actifs --}}
+            @if(request()->hasAny(['q','category','make','model']))
+                <div class="mt-2 d-flex gap-2 flex-wrap align-items-center">
+                    <small class="text-muted">Filtres actifs :</small>
+                    @if(request('q'))
+                        <span class="badge" style="background: #EEE5D3; color: var(--ap-primary); font-weight: 600; font-size: .75rem;">
+                            <i class="bi bi-search me-1"></i>{{ request('q') }}
+                        </span>
+                    @endif
+                    @if(request('category'))
+                        <span class="badge" style="background: #EEE5D3; color: var(--ap-primary); font-weight: 600; font-size: .75rem;">
+                            <i class="bi bi-tag me-1"></i>Catégorie
+                        </span>
+                    @endif
+                    @if(request('make'))
+                        <span class="badge" style="background: #EEE5D3; color: var(--ap-primary); font-weight: 600; font-size: .75rem;">
+                            <i class="bi bi-car-front me-1"></i>Marque
+                        </span>
+                    @endif
+                </div>
             @endif
-        </p>
+        </form>
     </div>
 
+    {{-- Grille produits --}}
     @if($products->count())
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
             @foreach($products as $product)
@@ -92,33 +117,51 @@
             @endforeach
         </div>
 
-        <div class="mt-4 d-flex justify-content-center">
-            {{ $products->links() }}
-        </div>
+        {{-- Pagination --}}
+        @if($products->hasPages())
+            <div class="mt-5 d-flex justify-content-center">
+                {{ $products->links() }}
+            </div>
+        @endif
+
     @else
-        <div class="text-center py-5">
-            <i class="bi bi-search display-4 text-muted mb-3 d-block"></i>
-            <h5 class="text-muted">Aucun produit trouvé</h5>
-            <p class="text-muted">Essayez d'autres critères ou</p>
-            <a href="{{ route('part-requests.create') }}" class="btn btn-outline-dark">
-                Soumettre une demande de recherche
-            </a>
+        {{-- État vide --}}
+        <div class="text-center py-5 mt-2">
+            <div style="width: 80px; height: 80px; background: #EEE5D3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; color: var(--ap-primary);">
+                <i class="bi bi-search"></i>
+            </div>
+            <h5 class="fw-bold mb-1">Aucune pièce trouvée</h5>
+            <p class="text-muted mb-3">
+                @if(request('q'))
+                    Aucun résultat pour « {{ request('q') }} ». Essayez d'autres termes.
+                @else
+                    Aucun produit ne correspond à vos critères de recherche.
+                @endif
+            </p>
+            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                <a href="{{ route('products.index') }}"
+                   class="btn btn-ap-outline-primary btn-sm">
+                    <i class="bi bi-x me-1"></i>Effacer les filtres
+                </a>
+                <a href="{{ route('part-requests.create') }}"
+                   class="btn btn-ap-accent btn-sm">
+                    <i class="bi bi-search me-1"></i>Soumettre une demande
+                </a>
+            </div>
         </div>
     @endif
+
 </div>
 @endsection
 
 @push('scripts')
 <script>
-// Rechargement des modèles quand la marque change
 document.getElementById('make').addEventListener('change', function () {
     const makeId = this.value;
     const url = new URL(window.location.href);
     url.searchParams.set('make', makeId);
     url.searchParams.delete('model');
-    if (!makeId) {
-        url.searchParams.delete('make');
-    }
+    if (!makeId) url.searchParams.delete('make');
     window.location.href = url.toString();
 });
 </script>

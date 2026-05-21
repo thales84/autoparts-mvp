@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description');
             $table->enum('condition', ['used_good', 'used_fair', 'refurbished', 'for_parts'])->default('used_good');
             $table->decimal('price', 12, 2);
-            $table->char('currency', 3)->default('XAF');
+            $table->char('currency', 3)->default('EUR');
             $table->unsignedInteger('stock_quantity')->default(0);
             $table->enum('status', ['draft', 'active', 'inactive'])->default('draft');
             $table->string('main_image_path')->nullable();

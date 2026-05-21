@@ -3,16 +3,24 @@
 @section('title', 'Connexion')
 
 @section('content')
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5 col-lg-4">
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
-                    <h3 class="card-title mb-4 text-center">Connexion</h3>
+<div class="ap-auth-wrap">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-10 col-md-7 col-lg-5 col-xl-4">
+                <div class="ap-auth-card">
+
+                    {{-- Logo --}}
+                    <a href="{{ route('home') }}" class="auth-logo mb-4 d-block">
+                        <i class="bi bi-gear-fill brand-icon me-1"></i>PALERME AUTO PRO
+                    </a>
+
+                    <h2 class="auth-title">Connexion</h2>
+                    <p class="auth-subtitle">Accédez à votre compte pour passer commande.</p>
 
                     <form action="{{ route('login') }}" method="POST" novalidate>
                         @csrf
 
+                        {{-- Email --}}
                         <div class="mb-3">
                             <label for="email" class="form-label">Adresse email</label>
                             <input
@@ -24,12 +32,14 @@
                                 required
                                 autocomplete="email"
                                 autofocus
+                                placeholder="votre@email.com"
                             >
                             @error('email')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
+                        {{-- Mot de passe --}}
                         <div class="mb-3">
                             <label for="password" class="form-label">Mot de passe</label>
                             <input
@@ -39,26 +49,35 @@
                                 class="form-control @error('password') is-invalid @enderror"
                                 required
                                 autocomplete="current-password"
+                                placeholder="••••••••"
                             >
                             @error('password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <div class="mb-4 form-check">
-                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                            <label class="form-check-label text-muted small" for="remember">Se souvenir de moi</label>
+                        {{-- Remember --}}
+                        <div class="mb-4 d-flex align-items-center gap-2">
+                            <input type="checkbox" class="form-check-input m-0" id="remember" name="remember">
+                            <label class="form-check-label text-muted" for="remember" style="font-size: .85rem; cursor: pointer;">
+                                Se souvenir de moi
+                            </label>
                         </div>
 
-                        <button type="submit" class="btn btn-dark w-100">Se connecter</button>
+                        <button type="submit" class="btn-submit">
+                            Se connecter
+                        </button>
                     </form>
 
-                    <hr class="my-4">
+                    <div class="mt-4 pt-3 text-center" style="border-top: 1px solid var(--ap-border);">
+                        <span class="text-muted" style="font-size: .88rem;">Pas encore de compte ?</span>
+                        <a href="{{ route('register') }}"
+                           class="fw-semibold text-decoration-none ms-1"
+                           style="color: var(--ap-accent);">
+                            Créer un compte
+                        </a>
+                    </div>
 
-                    <p class="text-center mb-0 text-muted small">
-                        Pas encore de compte ?
-                        <a href="{{ route('register') }}">Créer un compte</a>
-                    </p>
                 </div>
             </div>
         </div>

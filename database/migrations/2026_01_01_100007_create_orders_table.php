@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('delivery_fee', 12, 2)->default(0);
             $table->decimal('tax_amount', 12, 2)->default(0);
             $table->decimal('total', 12, 2);
-            $table->char('currency', 3)->default('XAF');
+            $table->char('currency', 3)->default('EUR');
             $table->string('customer_name', 120);
             $table->string('customer_email', 190);
             $table->string('customer_phone', 40)->nullable();

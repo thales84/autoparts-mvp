@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -56,6 +57,26 @@ class Order extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function proofs(): HasMany
+    {
+        return $this->hasMany(PaymentProof::class);
+    }
+
+    public function amountPaid(): float
+    {
+        return (float) $this->proofs()->where('status', 'validated')->sum('amount');
+    }
+
+    public function amountRemaining(): float
+    {
+        return max(0, (float) $this->total - $this->amountPaid());
+    }
+
+    public function isFullyPaid(): bool
+    {
+        return $this->amountRemaining() <= 0;
     }
 
     public function statusLabel(): string
