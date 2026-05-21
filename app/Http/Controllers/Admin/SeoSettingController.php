@@ -28,7 +28,7 @@ class SeoSettingController extends Controller
             'seo_og_title'                => ['nullable', 'string', 'max:95'],
             'seo_og_description'          => ['nullable', 'string', 'max:200'],
             'seo_og_image'                => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'seo_google_analytics'        => ['nullable', 'string', 'max:20', 'regex:/^(G-[A-Z0-9]+|UA-\d+-\d+)?$/'],
+            'seo_google_analytics'        => ['nullable', 'string', 'max:20'],
             'seo_google_site_verification'=> ['nullable', 'string', 'max:100'],
         ]);
 
