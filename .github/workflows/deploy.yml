@@ -94,14 +94,14 @@ jobs:
       - name: Envoyer email d'erreur
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: mail.palermeautopro.shop
+          server_address: smtp.gmail.com
           server_port: 465
           secure: true
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
           subject: "Erreur déploiement — palermeautopro.shop"
           to: paulsyl20jobs@gmail.com
-          from: "PALERME AUTO PRO <contact@palermeautopro.shop>"
+          from: ${{ secrets.MAIL_USERNAME }}
           body: |
             Une erreur s'est produite lors du pipeline CI/CD.
 
