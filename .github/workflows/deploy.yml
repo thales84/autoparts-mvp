@@ -1,0 +1,42 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: SSH Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd ~/domains/palermeautopro.shop/public_html
+
+            echo ">> git pull"
+            git pull origin main
+
+            echo ">> composer"
+            composer install --no-dev --optimize-autoloader --no-interaction
+
+            echo ">> migrate"
+            php artisan migrate --force
+
+            echo ">> cache"
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan cache:clear
+
+            echo ">> permissions"
+            chmod -R 775 storage bootstrap/cache
+
+            echo ">> done"
