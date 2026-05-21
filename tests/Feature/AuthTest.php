@@ -24,7 +24,7 @@ class AuthTest extends TestCase
             'email'                 => 'jean@example.com',
             'password'              => 'password123',
             'password_confirmation' => 'password123',
-        ])->assertRedirect(route('home'));
+        ])->assertRedirect(route('verification.notice'));
 
         $this->assertDatabaseHas('users', ['email' => 'jean@example.com', 'role' => 'customer']);
         $this->assertAuthenticated();
