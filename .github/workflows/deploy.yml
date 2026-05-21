@@ -100,7 +100,7 @@ jobs:
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
           subject: "Erreur déploiement — palermeautopro.shop"
-          to: paulsyl20@gmail.com
+          to: paulsyl20jobs@gmail.com
           from: "PALERME AUTO PRO <contact@palermeautopro.shop>"
           body: |
             Une erreur s'est produite lors du pipeline CI/CD.
