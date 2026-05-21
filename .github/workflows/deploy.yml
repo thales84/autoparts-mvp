@@ -1,13 +1,53 @@
-name: Deploy to Hostinger
+name: Test & Deploy — palermeautopro.shop
 
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy:
-    name: SSH Deploy
+
+  # ─────────────────────────────────────────
+  # 1. TESTS — bloque le déploiement si échec
+  # ─────────────────────────────────────────
+  test:
+    name: Tests PHP 8.3
     runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo, pdo_sqlite, gd, xml, zip, intl
+          coverage: none
+
+      - name: Installer les dépendances
+        run: composer install --optimize-autoloader --no-interaction
+
+      - name: Configurer l'environnement de test
+        run: |
+          cp .env.example .env
+          echo "APP_ENV=testing" >> .env
+          echo "APP_KEY=" >> .env
+          echo "DB_CONNECTION=sqlite" >> .env
+          echo "DB_DATABASE=:memory:" >> .env
+          php artisan key:generate
+
+      - name: Migrations en mémoire
+        run: php artisan migrate --force
+
+      - name: Lancer les tests
+        run: php artisan test --stop-on-failure
+
+  # ─────────────────────────────────────────
+  # 2. DÉPLOIEMENT — uniquement si tests OK
+  # ─────────────────────────────────────────
+  deploy:
+    name: Déploiement Hostinger
+    runs-on: ubuntu-latest
+    needs: test
 
     steps:
       - name: Deploy via SSH
@@ -40,3 +80,36 @@ jobs:
             chmod -R 775 storage bootstrap/cache
 
             echo ">> done"
+
+  # ─────────────────────────────────────────
+  # 3. NOTIFICATION — email si erreur
+  # ─────────────────────────────────────────
+  notify:
+    name: Notification erreur
+    runs-on: ubuntu-latest
+    needs: [test, deploy]
+    if: failure()
+
+    steps:
+      - name: Envoyer email d'erreur
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: mail.palermeautopro.shop
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "Erreur déploiement — palermeautopro.shop"
+          to: paulsyl20@gmail.com
+          from: "PALERME AUTO PRO <contact@palermeautopro.shop>"
+          body: |
+            Une erreur s'est produite lors du pipeline CI/CD.
+
+            Repo    : ${{ github.repository }}
+            Branche : ${{ github.ref_name }}
+            Commit  : ${{ github.sha }}
+            Auteur  : ${{ github.actor }}
+            Message : ${{ github.event.head_commit.message }}
+
+            Voir les logs complets :
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
