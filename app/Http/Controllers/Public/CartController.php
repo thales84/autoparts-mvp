@@ -29,6 +29,18 @@ class CartController extends Controller
             'quantity'   => ['required', 'integer', 'min:1'],
         ]);
 
+        $product = Product::where('id', $request->product_id)
+            ->where('status', 'active')
+            ->where('stock_quantity', '>', 0)
+            ->first();
+
+        if (! $product) {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Produit indisponible.'], 422);
+            }
+            return back()->with('error', 'Ce produit n\'est plus disponible.');
+        }
+
         $this->cart->add(
             (int) $request->product_id,
             (int) $request->quantity,
