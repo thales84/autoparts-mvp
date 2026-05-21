@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ProofReceived;
 use App\Models\Order;
 use App\Models\PaymentProof;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -81,11 +83,16 @@ class AccountController extends Controller
         $name = bin2hex(random_bytes(8)) . '.' . strtolower($file->getClientOriginalExtension());
         $file->move(public_path('uploads/proofs'), $name);
 
-        PaymentProof::create([
+        $proof = PaymentProof::create([
             'order_id'  => $order->id,
             'amount'    => $request->amount,
             'file_path' => 'uploads/proofs/' . $name,
         ]);
+
+        try {
+            $adminEmail = Setting::get('contact_email', config('mail.from.address'));
+            Mail::to($adminEmail)->send(new ProofReceived($proof->load('order')));
+        } catch (\Throwable) {}
 
         return back()->with('success', 'Preuve de paiement soumise. L\'admin la validera dans les meilleurs délais.');
     }

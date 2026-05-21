@@ -2,12 +2,16 @@
 
 namespace App\Services\Orders;
 
+use App\Mail\NewOrderAdmin;
+use App\Mail\OrderConfirmation;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\Cart\CartService;
 use App\Services\Payments\PaymentResult;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class OrderService
@@ -27,7 +31,7 @@ class OrderService
             ]);
         }
 
-        return DB::transaction(function () use ($user, $data) {
+        $order = DB::transaction(function () use ($user, $data) {
 
             $items      = $this->cart->getItems();
             $subtotal   = 0.0;
@@ -89,6 +93,24 @@ class OrderService
 
             return $order;
         });
+
+        $this->sendOrderEmails($order);
+
+        return $order;
+    }
+
+    private function sendOrderEmails(Order $order): void
+    {
+        $order->load('items');
+
+        try {
+            Mail::to($order->customer_email)->send(new OrderConfirmation($order));
+        } catch (\Throwable) {}
+
+        try {
+            $adminEmail = Setting::get('contact_email', config('mail.from.address'));
+            Mail::to($adminEmail)->send(new NewOrderAdmin($order));
+        } catch (\Throwable) {}
     }
 
     /**

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ProofStatusChanged;
 use App\Models\PaymentProof;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class PaymentProofController extends Controller
@@ -49,6 +51,10 @@ class PaymentProofController extends Controller
             }
         });
 
+        try {
+            Mail::to($proof->order->customer_email)->send(new ProofStatusChanged($proof->load('order')));
+        } catch (\Throwable) {}
+
         return back()->with('success', "Preuve #{$proof->id} validée.");
     }
 
@@ -63,6 +69,10 @@ class PaymentProofController extends Controller
             'admin_notes' => $request->admin_notes,
             'reviewed_at' => now(),
         ]);
+
+        try {
+            Mail::to($proof->order->customer_email)->send(new ProofStatusChanged($proof->load('order')));
+        } catch (\Throwable) {}
 
         return back()->with('success', "Preuve #{$proof->id} rejetée.");
     }
