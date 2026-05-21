@@ -26,5 +26,9 @@ Thumbs.db
 !/public/uploads/products/.gitkeep
 /public/uploads/proofs/*
 !/public/uploads/proofs/.gitkeep
+/public/uploads/seo/*
+!/public/uploads/seo/.gitkeep
+/public/uploads/logo/*
+!/public/uploads/logo/.gitkeep
 *.pdf
 /.claude

@@ -101,6 +101,10 @@
                href="{{ route('admin.payment-settings.edit') }}">
                 <i class="bi bi-gear-fill"></i>Paramètres
             </a>
+            <a class="nav-link {{ request()->routeIs('admin.seo-settings.*') ? 'active' : '' }}"
+               href="{{ route('admin.seo-settings.edit') }}">
+                <i class="bi bi-search"></i>SEO
+            </a>
         </nav>
 
         <div class="sidebar-section">Compte</div>

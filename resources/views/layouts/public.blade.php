@@ -1,10 +1,71 @@
 <!DOCTYPE html>
+@php
+    use App\Models\Setting;
+    $seoTitle       = Setting::get('seo_title',       config('app.name') . ' — Pièces auto d\'occasion');
+    $seoDescription = Setting::get('seo_description', 'Pièces détachées automobiles d\'occasion vérifiées, fiables et abordables.');
+    $seoKeywords    = Setting::get('seo_keywords',    '');
+    $seoRobots      = Setting::get('seo_robots',      'index,follow');
+    $seoOgTitle     = Setting::get('seo_og_title',    '') ?: $seoTitle;
+    $seoOgDesc      = Setting::get('seo_og_description', '') ?: $seoDescription;
+    $seoOgImage     = Setting::get('seo_og_image',    '');
+    $seoGa          = Setting::get('seo_google_analytics', '');
+    $seoGsv         = Setting::get('seo_google_site_verification', '');
+
+    $pageTitle      = View::hasSection('seo_title')       ? View::getSection('seo_title')       : $seoTitle;
+    $pageDesc       = View::hasSection('seo_description') ? View::getSection('seo_description') : $seoDescription;
+@endphp
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', config('app.name', 'PALERME AUTO PRO')) — Pièces auto d'occasion</title>
+
+    <title>@yield('seo_title', $seoTitle)</title>
+
+    {{-- Méta de base --}}
+    <meta name="description" content="@yield('seo_description', $seoDescription)">
+    @if($seoKeywords)
+    <meta name="keywords" content="{{ $seoKeywords }}">
+    @endif
+    <meta name="robots" content="{{ $seoRobots }}">
+    @if($seoGsv)
+    <meta name="google-site-verification" content="{{ $seoGsv }}">
+    @endif
+
+    {{-- Canonical --}}
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    {{-- Open Graph --}}
+    <meta property="og:type"        content="website">
+    <meta property="og:site_name"   content="{{ config('app.name') }}">
+    <meta property="og:url"         content="{{ url()->current() }}">
+    <meta property="og:title"       content="@yield('seo_title', $seoOgTitle)">
+    <meta property="og:description" content="@yield('seo_description', $seoOgDesc)">
+    @if($seoOgImage)
+    <meta property="og:image"       content="{{ asset('uploads/seo/' . $seoOgImage) }}">
+    <meta property="og:image:width"  content="1200">
+    <meta property="og:image:height" content="630">
+    @endif
+
+    {{-- Twitter Card --}}
+    <meta name="twitter:card"        content="summary_large_image">
+    <meta name="twitter:title"       content="@yield('seo_title', $seoOgTitle)">
+    <meta name="twitter:description" content="@yield('seo_description', $seoOgDesc)">
+    @if($seoOgImage)
+    <meta name="twitter:image"       content="{{ asset('uploads/seo/' . $seoOgImage) }}">
+    @endif
+
+    {{-- Google Analytics 4 (production uniquement) --}}
+    @if($seoGa && app()->environment('production'))
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $seoGa }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ $seoGa }}');
+    </script>
+    @endif
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">

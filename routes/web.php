@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PartRequestController as AdminPartRequestController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\PaymentSettingController;
+use App\Http\Controllers\Admin\SeoSettingController;
 use App\Http\Controllers\Admin\PaymentProofController as AdminProofController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 
@@ -75,6 +76,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     Route::get('payment-settings', [PaymentSettingController::class, 'edit'])->name('payment-settings.edit');
     Route::put('payment-settings', [PaymentSettingController::class, 'update'])->name('payment-settings.update');
+
+    Route::get('seo-settings', [SeoSettingController::class, 'edit'])->name('seo-settings.edit');
+    Route::put('seo-settings', [SeoSettingController::class, 'update'])->name('seo-settings.update');
+    Route::delete('seo-settings/og-image', [SeoSettingController::class, 'deleteOgImage'])->name('seo-settings.og-image.delete');
 
     Route::get('payment-proofs', [AdminProofController::class, 'index'])->name('payment-proofs.index');
     Route::patch('payment-proofs/{proof}/validate', [AdminProofController::class, 'validate'])->name('payment-proofs.validate');
