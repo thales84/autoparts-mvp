@@ -52,8 +52,8 @@
     <meta name="twitter:image"       content="{{ asset('uploads/seo/' . $seoOgImage) }}">
     @endif
 
-    {{-- Google Analytics 4 (production uniquement) --}}
-    @if($seoGa && app()->environment('production'))
+    {{-- Google Analytics 4 --}}
+    @if($seoGa)
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ $seoGa }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
