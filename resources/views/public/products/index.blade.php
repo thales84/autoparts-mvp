@@ -22,6 +22,13 @@
 
     {{-- Filtres --}}
     <div class="ap-filter-panel">
+        @if($singleMake)
+            <div class="d-inline-flex align-items-center gap-2 mb-3 px-3 py-1 rounded-pill"
+                 style="background: #EEE5D3; font-size: .82rem; font-weight: 600; color: var(--ap-primary);">
+                <i class="bi bi-star-fill" style="font-size: .7rem;"></i>
+                Spécialiste {{ $singleMake->name }}
+            </div>
+        @endif
         <form action="{{ route('products.index') }}" method="GET">
             <div class="row g-2 align-items-end">
                 <div class="col-12 col-md-4">
@@ -35,7 +42,7 @@
                         autocomplete="off"
                     >
                 </div>
-                <div class="col-6 col-md-2">
+                <div class="col-6 col-md-3">
                     <label class="form-label">Catégorie</label>
                     <select name="category" class="form-select">
                         <option value="">Toutes</option>
@@ -46,24 +53,27 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-6 col-md-2">
-                    <label class="form-label">Marque</label>
-                    <select id="make" name="make" class="form-select">
-                        <option value="">Toutes</option>
-                        @foreach($makes as $make)
-                            <option value="{{ $make->id }}" {{ request('make') == $make->id ? 'selected' : '' }}>
-                                {{ $make->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-6 col-md-2">
-                    <label class="form-label">Modèle</label>
-                    <select id="model" name="model" class="form-select">
+                @if(!$singleMake)
+                    {{-- Filtre marque visible uniquement si mode multi-marques --}}
+                    <div class="col-6 col-md-2">
+                        <label class="form-label">Marque</label>
+                        <select id="make-select" name="make" class="form-select">
+                            <option value="">Toutes</option>
+                            @foreach($makes as $mk)
+                                <option value="{{ $mk->id }}" {{ request('make') == $mk->id ? 'selected' : '' }}>
+                                    {{ $mk->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+                <div class="col-6 col-md-3">
+                    <label class="form-label">Modèle {{ $singleMake ? $singleMake->name : '' }}</label>
+                    <select name="model" class="form-select">
                         <option value="">Tous</option>
-                        @foreach($selectedModels as $model)
-                            <option value="{{ $model->id }}" {{ request('model') == $model->id ? 'selected' : '' }}>
-                                {{ $model->name }}
+                        @foreach($selectedModels as $mdl)
+                            <option value="{{ $mdl->id }}" {{ request('model') == $mdl->id ? 'selected' : '' }}>
+                                {{ $mdl->name }}
                             </option>
                         @endforeach
                     </select>
@@ -97,9 +107,14 @@
                             <i class="bi bi-tag me-1"></i>Catégorie
                         </span>
                     @endif
-                    @if(request('make'))
+                    @if(!$singleMake && request('make'))
                         <span class="badge" style="background: #EEE5D3; color: var(--ap-primary); font-weight: 600; font-size: .75rem;">
                             <i class="bi bi-car-front me-1"></i>Marque
+                        </span>
+                    @endif
+                    @if(request('model'))
+                        <span class="badge" style="background: #EEE5D3; color: var(--ap-primary); font-weight: 600; font-size: .75rem;">
+                            <i class="bi bi-car-front me-1"></i>Modèle
                         </span>
                     @endif
                 </div>
@@ -156,13 +171,16 @@
 
 @push('scripts')
 <script>
-document.getElementById('make').addEventListener('change', function () {
-    const makeId = this.value;
-    const url = new URL(window.location.href);
-    url.searchParams.set('make', makeId);
-    url.searchParams.delete('model');
-    if (!makeId) url.searchParams.delete('make');
-    window.location.href = url.toString();
-});
+const makeSelect = document.getElementById('make-select');
+if (makeSelect) {
+    makeSelect.addEventListener('change', function () {
+        const makeId = this.value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('make', makeId);
+        url.searchParams.delete('model');
+        if (!makeId) url.searchParams.delete('make');
+        window.location.href = url.toString();
+    });
+}
 </script>
 @endpush

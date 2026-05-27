@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\VehicleMake;
 use App\Models\VehicleModel;
 use Illuminate\Http\Request;
@@ -43,12 +44,21 @@ class ProductController extends Controller
             });
         }
 
-        $products    = $query->latest()->paginate(12)->withQueryString();
-        $categories  = Category::where('is_active', true)->orderBy('name')->get();
-        $makes       = VehicleMake::orderBy('name')->get();
+        $products   = $query->latest()->paginate(12)->withQueryString();
+        $categories = Category::where('is_active', true)->orderBy('name')->get();
 
+        $singleMake = VehicleMake::find(Setting::get('single_make_id'));
+
+        // En mode multi-marques, on charge toutes les marques pour le filtre
+        $makes = $singleMake ? collect() : VehicleMake::orderBy('name')->get();
+
+        // En mode marque unique, les modèles sont toujours disponibles pour filtrer
         $selectedModels = collect();
-        if ($makeId = $request->input('make')) {
+        if ($singleMake) {
+            $selectedModels = VehicleModel::where('vehicle_make_id', $singleMake->id)
+                ->orderBy('name')
+                ->get();
+        } elseif ($makeId = $request->input('make')) {
             $selectedModels = VehicleModel::where('vehicle_make_id', $makeId)->orderBy('name')->get();
         }
 
@@ -56,6 +66,7 @@ class ProductController extends Controller
             'products',
             'categories',
             'makes',
+            'singleMake',
             'selectedModels'
         ));
     }

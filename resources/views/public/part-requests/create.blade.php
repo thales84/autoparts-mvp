@@ -106,10 +106,16 @@
                                 type="text"
                                 id="vehicle_make"
                                 name="vehicle_make"
-                                class="form-control @error('vehicle_make') is-invalid @enderror"
-                                value="{{ old('vehicle_make') }}"
-                                placeholder="Toyota, BMW, Peugeot…"
+                                class="form-control @error('vehicle_make') is-invalid @enderror {{ $singleMake ? 'bg-light' : '' }}"
+                                value="{{ old('vehicle_make', $singleMake?->name ?? '') }}"
+                                placeholder="Mercedes-Benz, BMW, Peugeot…"
+                                {{ $singleMake ? 'readonly' : '' }}
                             >
+                            @if($singleMake)
+                                <div class="form-text" style="font-size: .75rem;">
+                                    <i class="bi bi-lock-fill me-1"></i>Spécialiste {{ $singleMake->name }} uniquement
+                                </div>
+                            @endif
                             @error('vehicle_make')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

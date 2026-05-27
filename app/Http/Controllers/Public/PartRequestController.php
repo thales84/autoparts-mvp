@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePartRequestRequest;
 use App\Models\PartRequest;
+use App\Models\Setting;
+use App\Models\VehicleMake;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,7 +20,9 @@ class PartRequestController extends Controller
             'reference'           => $request->query('reference', ''),
         ];
 
-        return view('public.part-requests.create', compact('prefill'));
+        $singleMake = VehicleMake::find(Setting::get('single_make_id'));
+
+        return view('public.part-requests.create', compact('prefill', 'singleMake'));
     }
 
     public function store(StorePartRequestRequest $request): RedirectResponse

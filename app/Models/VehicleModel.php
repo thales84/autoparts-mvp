@@ -12,6 +12,7 @@ class VehicleModel extends Model
         'vehicle_make_id',
         'name',
         'slug',
+        'year_start',
     ];
 
     public function vehicleMake(): BelongsTo
