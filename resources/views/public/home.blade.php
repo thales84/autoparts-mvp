@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Accueil')
+@section('title', $singleMake ? 'Spécialiste pièces ' . $singleMake->name . ' d\'occasion' : 'Accueil')
 
 @section('content')
 
@@ -10,15 +10,30 @@
         <div class="row align-items-center">
             <div class="col-lg-7">
                 <p class="hero-eyebrow">
-                    <i class="bi bi-geo-alt-fill me-1"></i>Pièces disponibles maintenant
+                    @if($singleMake)
+                        <i class="bi bi-star-fill me-1"></i>Spécialiste {{ $singleMake->name }} — Pièces d'occasion
+                    @else
+                        <i class="bi bi-geo-alt-fill me-1"></i>Pièces disponibles maintenant
+                    @endif
                 </p>
                 <h1 class="hero-title">
-                    Trouvez la pièce auto<br>
-                    qu'il vous faut <span class="highlight">rapidement.</span>
+                    @if($singleMake)
+                        Votre expert pièces<br>
+                        <span class="highlight">{{ $singleMake->name }}</span> d'occasion
+                    @else
+                        Trouvez la pièce auto<br>
+                        qu'il vous faut <span class="highlight">rapidement.</span>
+                    @endif
                 </h1>
                 <p class="hero-subtitle">
-                    Pièces détachées d'occasion vérifiées, classées par état et compatibilité véhicule.
-                    Fiables et abordables.
+                    @if($singleMake)
+                        Moteur, freinage, suspension, carrosserie — toutes les pièces
+                        {{ $singleMake->name }} vérifiées, classées par état et par modèle.
+                        Fiables et abordables.
+                    @else
+                        Pièces détachées d'occasion vérifiées, classées par état et compatibilité véhicule.
+                        Fiables et abordables.
+                    @endif
                 </p>
 
                 {{-- Search box --}}
@@ -29,7 +44,7 @@
                                 type="text"
                                 class="form-control"
                                 name="q"
-                                placeholder="Rechercher : alternateur, pare-choc, boîte de vitesse…"
+                                placeholder="Rechercher : alternateur, amortisseur, boîte de vitesse…"
                                 autocomplete="off"
                                 autofocus
                             >
@@ -39,7 +54,7 @@
                         </div>
                         <div class="hero-tags">
                             <span class="hero-tag" onclick="this.closest('form').q.value='alternateur'; this.closest('form').submit();">Alternateur</span>
-                            <span class="hero-tag" onclick="this.closest('form').q.value='pare-choc'; this.closest('form').submit();">Pare-choc</span>
+                            <span class="hero-tag" onclick="this.closest('form').q.value='amortisseur'; this.closest('form').submit();">Amortisseur</span>
                             <span class="hero-tag" onclick="this.closest('form').q.value='boîte vitesse'; this.closest('form').submit();">Boîte de vitesse</span>
                             <span class="hero-tag" onclick="this.closest('form').q.value='moteur'; this.closest('form').submit();">Moteur</span>
                             <span class="hero-tag" onclick="this.closest('form').q.value='radiateur'; this.closest('form').submit();">Radiateur</span>
@@ -50,7 +65,11 @@
                 <div class="mt-3 d-flex gap-3 flex-wrap" style="font-size: .82rem; color: rgba(255,255,255,.65);">
                     <span><i class="bi bi-check2 me-1" style="color: var(--ap-accent-light);"></i>Pièces inspectées</span>
                     <span><i class="bi bi-check2 me-1" style="color: var(--ap-accent-light);"></i>Stock mis à jour</span>
-                    <span><i class="bi bi-check2 me-1" style="color: var(--ap-accent-light);"></i>Compatible multi-marques</span>
+                    @if($singleMake)
+                        <span><i class="bi bi-check2 me-1" style="color: var(--ap-accent-light);"></i>Expert {{ $singleMake->name }} uniquement</span>
+                    @else
+                        <span><i class="bi bi-check2 me-1" style="color: var(--ap-accent-light);"></i>Compatible multi-marques</span>
+                    @endif
                 </div>
             </div>
 
@@ -96,38 +115,89 @@
             </div>
             <div class="col-6 col-md-3">
                 <div class="ap-trust-item">
-                    <i class="bi bi-currency-exchange trust-icon"></i>
-                    <div>
-                        <div class="trust-label">Prix abordables</div>
-                        <div class="trust-desc">Pièces d'occasion fiables</div>
-                    </div>
+                    @if($singleMake)
+                        <i class="bi bi-star-fill trust-icon"></i>
+                        <div>
+                            <div class="trust-label">Spécialiste</div>
+                            <div class="trust-desc">{{ $singleMake->name }} uniquement</div>
+                        </div>
+                    @else
+                        <i class="bi bi-currency-exchange trust-icon"></i>
+                        <div>
+                            <div class="trust-label">Prix abordables</div>
+                            <div class="trust-desc">Pièces d'occasion fiables</div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+{{-- ======== MODÈLES (mode marque unique) ======== --}}
+@if($singleMake && $models->count())
+<section class="ap-section" style="background: var(--ap-bg-card); border-top: 1px solid var(--ap-border);">
+    <div class="container">
+        <div class="ap-section-header">
+            <div class="section-tag">Compatibilité véhicule</div>
+            <h2>Modèles {{ $singleMake->name }} couverts</h2>
+            <p>Sélectionnez votre modèle pour afficher les pièces compatibles.</p>
+        </div>
+
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3 mb-4">
+            @foreach($models as $model)
+                <div class="col">
+                    <a href="{{ route('products.index', ['model' => $model->id]) }}"
+                       class="ap-cat-card text-decoration-none d-flex flex-column align-items-center p-3 rounded h-100 text-center"
+                       style="background: var(--ap-bg); border: 1px solid var(--ap-border); transition: border-color .2s, box-shadow .2s, transform .2s;"
+                       onmouseover="this.style.borderColor='var(--ap-accent)'; this.style.boxShadow='var(--ap-shadow)'; this.style.transform='translateY(-2px)';"
+                       onmouseout="this.style.borderColor='var(--ap-border)'; this.style.boxShadow='none'; this.style.transform='none';">
+                        <div class="cat-icon-wrap mb-2">
+                            <i class="bi bi-car-front"></i>
+                        </div>
+                        <span class="cat-name fw-semibold" style="font-size: .85rem; color: var(--ap-text);">
+                            {{ $model->name }}
+                        </span>
+                        @if($model->year_start)
+                            <span style="font-size: .72rem; color: var(--ap-text-muted); margin-top: .2rem;">
+                                depuis {{ $model->year_start }}
+                            </span>
+                        @endif
+                    </a>
+                </div>
+            @endforeach
+        </div>
+
+        <div class="text-center">
+            <a href="{{ route('products.index') }}" class="btn btn-ap-outline-primary btn-sm">
+                <i class="bi bi-grid me-1"></i>Voir tout le catalogue
+            </a>
+        </div>
+    </div>
+</section>
+@endif
+
 {{-- ======== CATÉGORIES ======== --}}
 <section class="ap-section">
     <div class="container">
         <div class="ap-section-header">
             <div class="section-tag">Parcourir par catégorie</div>
-            <h2>Toutes les pièces auto</h2>
+            <h2>Toutes les pièces {{ $singleMake ? $singleMake->name : 'auto' }}</h2>
             <p>Moteur, freinage, carrosserie, électronique et plus encore.</p>
         </div>
 
         <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
             @php
             $cats = [
-                ['icon' => 'bi-cpu-fill',          'label' => 'Moteur',       'q' => 'moteur'],
-                ['icon' => 'bi-disc-fill',          'label' => 'Freinage',     'q' => 'frein'],
-                ['icon' => 'bi-arrows-move',        'label' => 'Suspension',   'q' => 'suspension'],
-                ['icon' => 'bi-lightning-charge-fill','label'=>'Électrique',   'q' => 'électrique'],
-                ['icon' => 'bi-wind',               'label' => 'Refroidissement','q'=>'radiateur'],
-                ['icon' => 'bi-car-front',          'label' => 'Carrosserie',  'q' => 'carrosserie'],
-                ['icon' => 'bi-gear-wide-connected','label' => 'Transmission', 'q' => 'boîte'],
-                ['icon' => 'bi-eye-fill',           'label' => 'Optiques',     'q' => 'phare'],
-                ['icon' => 'bi-wrench-adjustable',  'label' => 'Autres',       'q' => ''],
+                ['icon' => 'bi-cpu-fill',          'label' => 'Moteur',          'q' => 'moteur'],
+                ['icon' => 'bi-disc-fill',          'label' => 'Freinage',        'q' => 'frein'],
+                ['icon' => 'bi-arrows-move',        'label' => 'Suspension',      'q' => 'suspension'],
+                ['icon' => 'bi-lightning-charge-fill','label'=> 'Électrique',     'q' => 'électrique'],
+                ['icon' => 'bi-wind',               'label' => 'Refroidissement', 'q' => 'radiateur'],
+                ['icon' => 'bi-car-front',          'label' => 'Carrosserie',     'q' => 'carrosserie'],
+                ['icon' => 'bi-gear-wide-connected','label' => 'Transmission',    'q' => 'boîte'],
+                ['icon' => 'bi-eye-fill',           'label' => 'Optiques',        'q' => 'phare'],
+                ['icon' => 'bi-wrench-adjustable',  'label' => 'Autres',          'q' => ''],
             ];
             @endphp
 
@@ -158,7 +228,8 @@
                     <div>
                         <h6 class="fw-bold mb-1">Catalogue complet</h6>
                         <p class="text-muted small mb-0">
-                            Recherchez par nom, référence, marque ou modèle de véhicule.
+                            Recherchez par nom, référence OEM ou modèle
+                            {{ $singleMake ? $singleMake->name : 'de véhicule' }}.
                         </p>
                         <a href="{{ route('products.index') }}"
                            class="small fw-semibold mt-1 d-inline-block text-decoration-none"
@@ -183,13 +254,14 @@
             </div>
             <div class="col-md-4">
                 <div class="d-flex gap-3">
-                    <div style="width: 48px; height: 48px; background: var(--ap-bg-card)7ed; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.3rem; color: var(--ap-accent);">
+                    <div style="width: 48px; height: 48px; background: #EEE5D3; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.3rem; color: var(--ap-accent);">
                         <i class="bi bi-chat-dots-fill"></i>
                     </div>
                     <div>
                         <h6 class="fw-bold mb-1">Pièce introuvable ?</h6>
                         <p class="text-muted small mb-0">
-                            Faites une demande, nous rechercherons la pièce dont vous avez besoin.
+                            Faites une demande — nous rechercherons la pièce
+                            {{ $singleMake ? $singleMake->name : '' }} dont vous avez besoin.
                         </p>
                         <a href="{{ route('part-requests.create') }}"
                            class="small fw-semibold mt-1 d-inline-block text-decoration-none"
@@ -207,7 +279,9 @@
 <section class="ap-section">
     <div class="container">
         <div class="ap-cta-section">
-            <h2 class="mb-2">Vous ne trouvez pas votre pièce ?</h2>
+            <h2 class="mb-2">
+                Vous ne trouvez pas votre pièce {{ $singleMake ? $singleMake->name : '' }} ?
+            </h2>
             <p>
                 Soumettez une demande de recherche. Notre équipe s'occupe de retrouver la pièce dont vous avez besoin.
             </p>
